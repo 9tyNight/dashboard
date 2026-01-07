@@ -29,14 +29,17 @@ const navItems = [
 ];
 
 const statsData = [
+    // Row 1
     { label: 'Total Active Restaurants', value: '1,600', trend: '841', isUp: true },
     { label: 'Net Revenue (MTD)', value: '1,096.30 KWD', trend: '$841', isUp: true },
     { label: 'Active Terminals', value: '1,415', trend: '841', isUp: true },
     { label: 'Active WhatsApp Users', value: '778', trend: '841', isUp: true },
+    // Row 2
     { label: 'New Signups', value: '32', trend: '3', isUp: true },
     { label: 'Suspended Businesses', value: '4', trend: '234', isUp: false },
     { label: 'Downgrades', value: '3', trend: '1', isUp: true },
     { label: 'Avg. Uptime', value: '99.96%', trend: '841', isUp: true },
+    // Row 3
     { label: 'Open Support Tickets', value: '31', status: null },
     { label: 'System Health Status', value: 'Good', status: 'Good' },
     { label: 'Avg. Response Time', value: '2h 11m', status: null },
@@ -109,25 +112,30 @@ const SidebarItem = ({ icon: Icon, label, active = false, subItems = [], badge }
     );
 };
 
-const StatCard = ({ label, value, trend, isUp, status }) => (
-    <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between h-32">
-        <span className="text-xs font-semibold text-gray-500">{label}</span>
-        <div className="flex items-end justify-between mt-2">
-            <div className="flex flex-col">
-                {status === 'Good' ? (
-                    <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full w-max mt-2">● Good</span>
-                ) : (
-                    <span className="text-2xl font-bold text-gray-900">{value}</span>
+// NEW: A row container that holds 4 stats
+const StatsRow = ({ items }) => (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-gray-200 mb-6">
+        {items.map((stat, index) => (
+            <div key={index} className="p-6 flex flex-col justify-between h-32">
+                <span className="text-xs font-semibold text-gray-500">{stat.label}</span>
+                <div className="flex items-end justify-between mt-2">
+                    <div className="flex flex-col">
+                        {stat.status === 'Good' ? (
+                            <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full w-max mt-2">● Good</span>
+                        ) : (
+                            <span className="text-2xl font-bold text-gray-900">{stat.value}</span>
+                        )}
+                    </div>
+                </div>
+                {stat.trend && (
+                    <div className="flex items-center gap-1 mt-2">
+                        <span className="text-xs text-gray-500">Trend</span>
+                        {stat.isUp ? <ArrowUpRight size={14} className="text-green-500" /> : <ArrowDownRight size={14} className="text-red-500" />}
+                        <span className={`text-xs font-medium ${stat.isUp ? 'text-green-600' : 'text-red-600'}`}>{stat.trend}</span>
+                    </div>
                 )}
             </div>
-        </div>
-        {trend && (
-            <div className="flex items-center gap-1 mt-2">
-                <span className="text-xs text-gray-500">Trend</span>
-                {isUp ? <ArrowUpRight size={14} className="text-green-500" /> : <ArrowDownRight size={14} className="text-red-500" />}
-                <span className={`text-xs font-medium ${isUp ? 'text-green-600' : 'text-red-600'}`}>{trend}</span>
-            </div>
-        )}
+        ))}
     </div>
 );
 
@@ -192,8 +200,6 @@ const MenuItem = ({ icon: Icon, label }) => (
 
 export default function Dashboard() {
     const [activeMenu, setActiveMenu] = useState(null);
-
-    // Search States
     const [sidebarSearch, setSidebarSearch] = useState('');
     const [tableSearch, setTableSearch] = useState('');
 
@@ -273,11 +279,14 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    {statsData.map((stat, index) => (
-                        <StatCard key={index} {...stat} />
-                    ))}
+                {/* Stats Grid - Updated to be Rows */}
+                <div className="flex flex-col gap-1 mb-8">
+                    {/* Row 1 */}
+                    <StatsRow items={statsData.slice(0, 4)} />
+                    {/* Row 2 */}
+                    <StatsRow items={statsData.slice(4, 8)} />
+                    {/* Row 3 */}
+                    <StatsRow items={statsData.slice(8, 12)} />
                 </div>
 
                 {/* Charts Section 1 */}
@@ -498,7 +507,6 @@ export default function Dashboard() {
                         </table>
                     </div>
 
-                    {/* Pagination */}
                     <div className="p-4 border-t border-gray-200 flex items-center justify-between text-sm text-gray-600">
                         <button className="border border-gray-200 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-500">
                             <ArrowLeft size={16} />
